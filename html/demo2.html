@@ -1,0 +1,514 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>demo2</title><meta name="generator" content="MATLAB 8.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-07-28"><meta name="DC.source" content="demo2.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Clean up by clearing variables and command window and closing windows</a></li><li><a href="#3">Import Data</a></li><li><a href="#4">Correct Footage</a></li><li><a href="#5">Get Mask and Boundary for the whole cell</a></li><li><a href="#6">Get Bleach Mask And Boundary</a></li><li><a href="#7">Get Background Mask</a></li><li><a href="#8">Getting intensity functions</a></li><li><a href="#9">Plotting Data</a></li><li><a href="#10">Fitting Expoential Data</a></li><li><a href="#11">Mobile Fraction</a></li><li><a href="#12">half lives</a></li><li><a href="#13">Fitting Uniform Circle Kinetics</a></li><li><a href="#14">Diffusion Constant:</a></li></ul></div><pre class="codeinput"><span class="comment">% Demo 2</span>
+<span class="comment">% Script which should effectively run the included functions</span>
+</pre><h2>Clean up by clearing variables and command window and closing windows<a name="2"></a></h2><pre class="codeinput">close <span class="string">all</span>
+clear <span class="string">all</span>
+clc
+</pre><h2>Import Data<a name="3"></a></h2><p>first thing to do is to import the data from the .mvd2 file from Mark Marsh Data. The following invokes a modified bfopen.m included in the zip folder</p><pre class="codeinput">disp(<span class="string">'getting footage from file'</span>)
+
+[f, dF] = getFootage(<span class="string">'N:\FRAP\Data\FRAP_data_MarkMarsh\220611.mvd2'</span>, 11);
+<span class="comment">% this will automatically open the first series of data and return a</span>
+<span class="comment">% f1 = footage frames in structure under 'image' field and dF1 = all</span>
+<span class="comment">% supplimentary data on f1, see help Doc on getFootage for more help</span>
+
+<span class="comment">% n = input('what series would you like? : \n');</span>
+<span class="comment">% input number for the desired series, try 9 maybe?</span>
+
+<span class="comment">%[fn, dFn] = getFootage('N:\FRAP\Data\FRAP_data_MarkMarsh\220611.mvd2', n);</span>
+<span class="comment">%retrives data series n</span>
+</pre><pre class="codeoutput">getting footage from file
+VolocityReader initializing N:\FRAP\Data\FRAP_data_MarkMarsh\220611.mvd2
+VolocityReader initializing N:\FRAP\Data\FRAP_data_MarkMarsh\220611.mvd2
+Reading series #11
+    ........................................................................
+    ........................................................................
+    ........................................................................
+    ........................................................................
+    ........................................................................
+    ........................................................................
+    ..........
+N:\FRAP\Data\FRAP_data_MarkMarsh\220611.mvd2
+There are a total of 71 series in this data file 
+The total number of frames in this image sequence is: 442 
+ </pre><h2>Correct Footage<a name="4"></a></h2><p>the supplied .mvd2 data has a major flaw, every even numbered frame in all the series I have viewed is useless.Not all the series included (71 in total) are actually cell footage, some are graphs etc.</p><pre class="codeinput"><span class="comment">% % playVid(f,[1,100]); % show flawed data from frame 1 to 100</span>
+
+<span class="comment">% playVid(fn,1,100); % use this if you wish to see the other series you chose</span>
+
+disp(<span class="string">'correcting footage due to dud frames'</span>)
+
+fc = correctedFootage(f,[],[],<span class="string">'odd'</span>);
+
+<span class="comment">% Cuts to the first 100 frames and then keeps only the odd numbered frames.</span>
+<span class="comment">% [] is an option for cropping footage, see help doc on correctedFootage.</span>
+
+<span class="comment">% cfn = correctedFootage(fn, [1,100],[],'odd'); % use for series n</span>
+
+<span class="comment">%  playVid(fc,[1,25]);</span>
+</pre><pre class="codeoutput">correcting footage due to dud frames
+</pre><h2>Get Mask and Boundary for the whole cell<a name="5"></a></h2><pre class="codeinput">aver = 1;
+<span class="comment">% aver = input('number of initial frames to use for average? : \n');</span>
+
+disp(<span class="string">'getting cell mask and boundary'</span>)
+
+[cellMask, cellBoundary] = cellMaskAndBoundary(fc,aver,<span class="string">'no'</span>,<span class="string">'clean'</span>,<span class="string">'skel'</span>);
+
+<span class="comment">% the input aver is used to form an image of the cell over the first aver</span>
+<span class="comment">% frames giving a more uniform/consistent image. The input 'clean' takes</span>
+<span class="comment">% away all except the largest connected object in the image and 'skel'</span>
+<span class="comment">% thins the boundary to single pixel. Colour can also be added and the user</span>
+<span class="comment">% input for threshold supressed see help doc for more.</span>
+
+<span class="comment">% [cellMaskn, cellBoundaryn] = cellMaskAndBoundary(fn,aver,'clean', 'skel');</span>
+</pre><pre class="codeoutput">getting cell mask and boundary
+</pre><h2>Get Bleach Mask And Boundary<a name="6"></a></h2><pre class="codeinput">avb = [];
+<span class="comment">% avb = input('Guess for photobleaching frame : \n');</span>
+
+disp(<span class="string">'getting bleach mask and boundary'</span>)
+
+[bleachMask, bleachBoundary, instant] = bleachMaskAndBoundary(fc, cellMask, avb, <span class="string">'no'</span>,<span class="string">'clean'</span>,<span class="string">'skel'</span>);
+<span class="comment">% operates similarly to cellMaskAndBoundary except requires cellMask as an</span>
+<span class="comment">% input and can take a numeric input for the sure post bleach number (else</span>
+<span class="comment">% defults to 25, as here).</span>
+
+<span class="comment">% [bleachMaskn, bleachBoundaryn] = bleachMaskAndBoundary(fn,aver,'clean','skel');</span>
+</pre><pre class="codeoutput">getting bleach mask and boundary
+First post bleach frame: 9 
+</pre><h2>Get Background Mask<a name="7"></a></h2><pre class="codeinput">disp(<span class="string">'getting background mask'</span>)
+
+bgMask = backgroundMask(fc);
+
+<span class="comment">% returns a logical map or areas in the background, i.e. not cell (or too near cell)</span>
+<span class="comment">% or anyother bright spots.</span>
+</pre><pre class="codeoutput">getting background mask
+</pre><h2>Getting intensity functions<a name="8"></a></h2><p>raw</p><pre class="codeinput">[I_b, I_c, I_bg] = intensityFRAP(fc,bleachMask, instant, cellMask, bgMask);
+
+<span class="comment">% double norm</span>
+[~,dI] = evalc(<span class="string">'intensityFRAP(fc,bleachMask, instant, cellMask,bgMask, ''double'');'</span>);
+
+<span class="comment">% full norm</span>
+[~,fI] = evalc(<span class="string">'intensityFRAP(fc,bleachMask, instant, cellMask,bgMask, ''full'');'</span>);
+</pre><h2>Plotting Data<a name="9"></a></h2><pre class="codeinput">close <span class="string">all</span>
+
+t = ((1:(size(fc,3))) - instant)*1/25; <span class="comment">% This is the time vector, 1/25 is the footage frame rate [frames/s]</span>
+
+<span class="comment">% Plot ROIs</span>
+f1 = fc(:,:,1);
+
+b = bwmorph(ones(size(f1,1),size(f1,2)),<span class="string">'remove'</span>);
+
+figure, montage([b + f1,(b~=1).*(f1 + cellBoundary+ bleachBoundary + bgMask), b + fc(:,:,instant) + cellBoundary + bleachBoundary + bgMask/2])
+title(<span class="string">'[1] Prebleach Image;  [2] Cell Boundary + Bleach Boundary + Background Mask on Prebleach Image;  [3] Cell Boundary + Bleach Boundary + Background Mask (at half intensity) on Photobleached Image'</span>,<span class="string">'FontWeight'</span>,<span class="string">'bold'</span>)
+set(gcf, <span class="string">'Position'</span>, [100,450,1700,600])
+
+
+<span class="comment">% Raw</span>
+figure, subplot(<span class="string">'Position'</span>, [0.05,0.1,.45,.8])
+plot(t,I_b, t,I_c, t,I_bg);
+title(<span class="string">'Raw Intensity Curves'</span>)
+xlabel(<span class="string">'Time Scale/s'</span>)
+ylabel(<span class="string">'Raw Intensity per Pixel'</span>)
+axis([min(t),max(t),0,1.05])<span class="comment">% Grid Axis</span>
+grid <span class="string">on</span>
+set(gca, <span class="string">'GridLineStyle'</span>, <span class="string">'-'</span>);
+grid(gca,<span class="string">'minor'</span>)
+
+legend(gca, <span class="string">'FRAP ROI Raw Intensities'</span>,<span class="string">'Whole Cell Raw Intensity'</span>,<span class="string">'Background Raw Intensity'</span>, <span class="string">'Location'</span>, <span class="string">'best'</span> );
+
+subplot(<span class="string">'Position'</span>, [0.53,0.1,.45,.8])
+plot(t,I_b - I_bg, t,I_c - I_bg, t,I_bg - I_bg);
+title(<span class="string">'Background Subtracted Intensity Curves'</span>)
+xlabel(<span class="string">'Time Scale/s'</span>)
+axis([min(t),max(t),0,1.05])<span class="comment">% Grid Axis</span>
+grid <span class="string">on</span>
+set(gca, <span class="string">'GridLineStyle'</span>, <span class="string">'-'</span>);
+grid(gca,<span class="string">'minor'</span>)
+
+set(gcf, <span class="string">'Position'</span>, [50,100,900,350])
+
+<span class="comment">% Plotting dI and fI</span>
+figure, subplot(<span class="string">'Position'</span>, [0.05,0.1,.45,.8])
+plot(t,dI)
+title(<span class="string">'Double Normalised Curve'</span>)
+xlabel(<span class="string">'Time Scale/s'</span>)
+ylabel(<span class="string">'Normalised Intensity'</span>)
+
+axis([min(t),max(t),0,1.05])<span class="comment">% Grid Axis</span>
+grid <span class="string">on</span>
+set(gca, <span class="string">'GridLineStyle'</span>, <span class="string">'-'</span>);
+grid(gca,<span class="string">'minor'</span>)
+
+subplot(<span class="string">'Position'</span>, [0.53,0.1,.45,.8])
+plot(t,fI)
+title(<span class="string">'Full Normalised Curve'</span>)
+xlabel(<span class="string">'Time Scale/s'</span>)
+grid <span class="string">on</span>
+
+axis([min(t),max(t),0,1.05])<span class="comment">% Grid Axis</span>
+grid <span class="string">on</span>
+set(gca, <span class="string">'GridLineStyle'</span>, <span class="string">'-'</span>);
+grid(gca,<span class="string">'minor'</span>)
+
+set(gcf, <span class="string">'Position'</span>, [970,100,900,350])
+</pre><img vspace="5" hspace="5" src="demo2_01.png" alt=""> <img vspace="5" hspace="5" src="demo2_02.png" alt=""> <img vspace="5" hspace="5" src="demo2_03.png" alt=""> <h2>Fitting Expoential Data<a name="10"></a></h2><p>single fit</p><pre class="codeinput">[dnorm_sfit,dnorm_sfit_gof,dnorm_sfit_mobhalf, dnorm_sfit_uncer] = fitExp(dI,t);
+[fnorm_sfit,fnorm_sfit_gof,fnorm_sfit_mobhalf, fnorm_sfit_uncer] = fitExp(fI,t);
+
+<span class="comment">% double fit</span>
+[dnorm_dfit,dnorm_dfit_gof,dnorm_dfit_mobhalf, dnorm_dfit_uncer] = fitExp(dI,t,<span class="string">'double'</span>);
+[fnorm_dfit,fnorm_dfit_gof,fnorm_dfit_mobhalf, fnorm_dfit_uncer] = fitExp(fI,t,<span class="string">'double'</span>);
+</pre><img vspace="5" hspace="5" src="demo2_04.png" alt=""> <img vspace="5" hspace="5" src="demo2_05.png" alt=""> <img vspace="5" hspace="5" src="demo2_06.png" alt=""> <img vspace="5" hspace="5" src="demo2_07.png" alt=""> <h2>Mobile Fraction<a name="11"></a></h2><p>single expoential fit</p><pre class="codeinput">fprintf(<span class="string">'Single fit double normalised mobile fraction: (%-.*f   +/-   %-.1g) \n'</span>,(length(sprintf(<span class="string">'%.1g'</span>, dnorm_sfit_uncer.mobile))-2), dnorm_sfit_mobhalf.mobile, dnorm_sfit_uncer.mobile)
+fprintf(<span class="string">'Single fit full normalised mobile fraction:   (%-.*f   +/-   %-.1g) \n'</span>,(length(sprintf(<span class="string">'%.1g'</span>, fnorm_sfit_uncer.mobile))-2), fnorm_sfit_mobhalf.mobile, fnorm_sfit_uncer.mobile)
+
+<span class="comment">% double expoential fit</span>
+fprintf(<span class="string">'Double fit double normalised mobile fraction: (%-.*f   +/-   %-.1g) \n'</span>,(length(sprintf(<span class="string">'%.1g'</span>, dnorm_dfit_uncer.mobile))-2), dnorm_dfit_mobhalf.mobile, dnorm_dfit_uncer.mobile)
+fprintf(<span class="string">'Double fit full normalised mobile fraction:   (%-.*f   +/-   %-.1g) \n'</span>,(length(sprintf(<span class="string">'%.1g'</span>, fnorm_dfit_uncer.mobile))-2), fnorm_dfit_mobhalf.mobile, fnorm_dfit_uncer.mobile)
+</pre><pre class="codeoutput">Single fit double normalised mobile fraction: (0.781   +/-   0.006) 
+Single fit full normalised mobile fraction:   (0.815   +/-   0.005) 
+Double fit double normalised mobile fraction: (0.838   +/-   0.002) 
+Double fit full normalised mobile fraction:   (0.816   +/-   0.006) 
+</pre><h2>half lives<a name="12"></a></h2><p>single expoential fit</p><pre class="codeinput">fprintf(<span class="string">'Single fit double normalised halflife:  (%-.*f   +/-   %-.1g)s \n'</span>,(length(sprintf(<span class="string">'%.1g'</span>, dnorm_sfit_uncer.halflife))-2), dnorm_sfit_mobhalf.halflife, dnorm_sfit_uncer.halflife)
+fprintf(<span class="string">'Single fit full normalised halflife:    (%-.*f   +/-   %-.1g)s \n'</span>,(length(sprintf(<span class="string">'%.1g'</span>, fnorm_sfit_uncer.halflife))-2), fnorm_sfit_mobhalf.halflife, fnorm_sfit_uncer.halflife)
+
+<span class="comment">% double expoential fit</span>
+fprintf(<span class="string">'Double fit double normalised halflife:  (%-.*f   +/-   %-.1g)s \n'</span>,(length(sprintf(<span class="string">'%.1g'</span>, dnorm_dfit_uncer.halflife))-2), dnorm_dfit_mobhalf.halflife, dnorm_dfit_uncer.halflife)
+fprintf(<span class="string">'Double fit full normalised halflife:    (%-.*f   +/-   %-.1g)s \n'</span>,(length(sprintf(<span class="string">'%.1g'</span>, fnorm_dfit_uncer.halflife))-2), fnorm_dfit_mobhalf.halflife, fnorm_dfit_uncer.halflife)
+</pre><pre class="codeoutput">Single fit double normalised halflife:  (1.14   +/-   0.05)s 
+Single fit full normalised halflife:    (1.14   +/-   0.05)s 
+Double fit double normalised halflife:  (0.8   +/-   0.1)s 
+Double fit full normalised halflife:    (0.8   +/-   0.3)s 
+</pre><h2>Fitting Uniform Circle Kinetics<a name="13"></a></h2><p>Only works on full normalised data, if double normalised data is entered it is changed to full automatically</p><pre class="codeinput">[fit_UniCirc,fit_UniCirc_gof,fit_UniCirc_uncer] = fitUniCirc(fI,t);
+fprintf(<span class="string">'Uniform Circle fit charistic diffusion time:  (%-.*f   +/-  %-.1g)s \n'</span>,(length(sprintf(<span class="string">'%.1g'</span>,fit_UniCirc_uncer.td))-2),fit_UniCirc.td, fit_UniCirc_uncer.td)
+</pre><pre class="codeoutput">Uniform Circle fit charistic diffusion time:  (1.39   +/-  0.02)s 
+</pre><img vspace="5" hspace="5" src="demo2_08.png" alt=""> <h2>Diffusion Constant:<a name="14"></a></h2><p>assume uniform circular beam intensity profile:</p><pre class="codeinput">w2 = sum(sum(bleachMask))/pi; <span class="comment">%Circle radius squared</span>
+w = sqrt(w2); <span class="comment">%Circle radius squared</span>
+dw = sqrt(sum(sum(imclose(bleachMask,strel(<span class="string">'disk'</span>,ceil(w/2)))))/pi);
+ew = sqrt(sum(sum(imopen(bleachMask,strel(<span class="string">'disk'</span>,ceil(w/2)))))/pi);
+uncer_w2 = ((dw - ew)/2)*2*(w); <span class="comment">% uncertinity in circle radius squared</span>
+
+fprintf(<span class="string">'Radius of circle:  (%-g   +/-  %-g)pixels \n'</span>,w, ((dw - ew)/2))
+
+<span class="comment">% single expoential fit</span>
+dnorm_sfit_D = 0.224*(w2)/(dnorm_sfit_mobhalf.halflife);
+dnorm_sfit_uncer.D = 0.224*(dnorm_sfit_mobhalf.halflife)^(-1) * sqrt(uncer_w2^2 + (w2*dnorm_sfit_uncer.halflife/dnorm_sfit_mobhalf.halflife)^2);
+fprintf(<span class="string">'Single fit double normalised diffusion constant:  (%-g   +/-  %-g)pixel^2.s^-1 \n'</span>,dnorm_sfit_D, dnorm_sfit_uncer.D)
+
+fnorm_sfit_D = 0.224*(w2)/(fnorm_sfit_mobhalf.halflife);
+fnorm_sfit_uncer.D = 0.224*(fnorm_sfit_mobhalf.halflife)^(-1) * sqrt(uncer_w2^2 + (w2*fnorm_sfit_uncer.halflife/fnorm_sfit_mobhalf.halflife)^2);
+fprintf(<span class="string">'Single fit full normalised diffusion constant:    (%-g   +/-  %-g)pixel^2.s^-1 \n'</span>,fnorm_sfit_D, fnorm_sfit_uncer.D)
+
+<span class="comment">% double expoential fit</span>
+dnorm_dfit_D = 0.224*(w2)/(dnorm_dfit_mobhalf.halflife);
+dnorm_dfit_uncer.D = 0.224*(dnorm_dfit_mobhalf.halflife)^(-1) * sqrt(uncer_w2^2 + (w2*dnorm_dfit_uncer.halflife/dnorm_dfit_mobhalf.halflife)^2);
+fprintf(<span class="string">'Double fit double normalised diffusion constant:  (%-g   +/-  %-g)m^2.s^-1 \n'</span>,dnorm_dfit_D, dnorm_dfit_uncer.D)
+
+fnorm_dfit_D = 0.224*(w2)/(fnorm_dfit_mobhalf.halflife);
+fnorm_dfit_uncer.D = 0.224*(fnorm_dfit_mobhalf.halflife)^(-1) * sqrt(uncer_w2^2 + (w2*fnorm_dfit_uncer.halflife/fnorm_dfit_mobhalf.halflife)^2);
+fprintf(<span class="string">'Double fit full normalised diffusion constant:    (%-g   +/-  %-g)m^2.s^-1 \n'</span>,fnorm_dfit_D, fnorm_dfit_uncer.D)
+
+<span class="comment">% Uniform Circle Fitting</span>
+fit_UniCirc_D = (w2)/(4*fit_UniCirc.td);
+fit_UniCirc_uncer.D = (4*fit_UniCirc.td)^(-1) * sqrt(uncer_w2^2 + (w2*fit_UniCirc_uncer.td/fit_UniCirc.td)^2);
+fprintf(<span class="string">'Uniform Circle fit diffusion constant:            (%-g   +/-  %-g)m^2.s^-1 \n'</span>,fit_UniCirc_D, fit_UniCirc_uncer.D)
+</pre><pre class="codeoutput">Radius of circle:  (17.224   +/-  1.00142)pixels 
+Single fit double normalised diffusion constant:  (58.2747   +/-  7.1693)pixel^2.s^-1 
+Single fit full normalised diffusion constant:    (58.2922   +/-  7.17138)pixel^2.s^-1 
+Double fit double normalised diffusion constant:  (88.2481   +/-  17.934)m^2.s^-1 
+Double fit full normalised diffusion constant:    (84.2627   +/-  37.1934)m^2.s^-1 
+Uniform Circle fit diffusion constant:            (53.4243   +/-  6.26094)m^2.s^-1 
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2013a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+% Demo 2
+% Script which should effectively run the included functions
+
+%% Clean up by clearing variables and command window and closing windows
+close all
+clear all
+clc
+%% Import Data
+% first thing to do is to import the data from the .mvd2 file from Mark 
+% Marsh Data. The following invokes a modified bfopen.m included in the 
+% zip folder
+
+disp('getting footage from file')
+
+[f, dF] = getFootage('N:\FRAP\Data\FRAP_data_MarkMarsh\220611.mvd2', 11);
+% this will automatically open the first series of data and return a 
+% f1 = footage frames in structure under 'image' field and dF1 = all
+% supplimentary data on f1, see help Doc on getFootage for more help
+
+% n = input('what series would you like? : \n'); 
+% input number for the desired series, try 9 maybe?
+
+%[fn, dFn] = getFootage('N:\FRAP\Data\FRAP_data_MarkMarsh\220611.mvd2', n); 
+%retrives data series n
+
+
+%% Correct Footage
+% the supplied .mvd2 data has a major flaw, every even numbered frame in 
+% all the series I have viewed is useless.Not all the series included
+% (71 in total) are actually cell footage, some are graphs etc.
+
+% % playVid(f,[1,100]); % show flawed data from frame 1 to 100
+
+% playVid(fn,1,100); % use this if you wish to see the other series you chose
+
+disp('correcting footage due to dud frames')
+
+fc = correctedFootage(f,[],[],'odd'); 
+
+% Cuts to the first 100 frames and then keeps only the odd numbered frames.
+% [] is an option for cropping footage, see help doc on correctedFootage.
+
+% cfn = correctedFootage(fn, [1,100],[],'odd'); % use for series n
+
+%  playVid(fc,[1,25]);
+
+%% Get Mask and Boundary for the whole cell
+aver = 1;
+% aver = input('number of initial frames to use for average? : \n');
+
+disp('getting cell mask and boundary')
+
+[cellMask, cellBoundary] = cellMaskAndBoundary(fc,aver,'no','clean','skel');
+
+% the input aver is used to form an image of the cell over the first aver 
+% frames giving a more uniform/consistent image. The input 'clean' takes
+% away all except the largest connected object in the image and 'skel'
+% thins the boundary to single pixel. Colour can also be added and the user
+% input for threshold supressed see help doc for more.
+
+% [cellMaskn, cellBoundaryn] = cellMaskAndBoundary(fn,aver,'clean', 'skel');
+
+
+%% Get Bleach Mask And Boundary
+
+avb = [];
+% avb = input('Guess for photobleaching frame : \n');
+
+disp('getting bleach mask and boundary')
+
+[bleachMask, bleachBoundary, instant] = bleachMaskAndBoundary(fc, cellMask, avb, 'no','clean','skel');
+% operates similarly to cellMaskAndBoundary except requires cellMask as an 
+% input and can take a numeric input for the sure post bleach number (else 
+% defults to 25, as here).
+
+% [bleachMaskn, bleachBoundaryn] = bleachMaskAndBoundary(fn,aver,'clean','skel');
+
+%% Get Background Mask
+
+disp('getting background mask')
+
+bgMask = backgroundMask(fc);
+
+% returns a logical map or areas in the background, i.e. not cell (or too near cell)
+% or anyother bright spots.
+
+%% Getting intensity functions
+% raw
+[I_b, I_c, I_bg] = intensityFRAP(fc,bleachMask, instant, cellMask, bgMask);
+
+% double norm
+[~,dI] = evalc('intensityFRAP(fc,bleachMask, instant, cellMask,bgMask, ''double'');');
+
+% full norm
+[~,fI] = evalc('intensityFRAP(fc,bleachMask, instant, cellMask,bgMask, ''full'');');
+
+%% Plotting Data
+close all
+
+t = ((1:(size(fc,3))) - instant)*1/25; % This is the time vector, 1/25 is the footage frame rate [frames/s]
+
+% Plot ROIs
+f1 = fc(:,:,1);
+
+b = bwmorph(ones(size(f1,1),size(f1,2)),'remove');
+
+figure, montage([b + f1,(b~=1).*(f1 + cellBoundary+ bleachBoundary + bgMask), b + fc(:,:,instant) + cellBoundary + bleachBoundary + bgMask/2])
+title('[1] Prebleach Image;  [2] Cell Boundary + Bleach Boundary + Background Mask on Prebleach Image;  [3] Cell Boundary + Bleach Boundary + Background Mask (at half intensity) on Photobleached Image','FontWeight','bold')
+set(gcf, 'Position', [100,450,1700,600])
+
+
+% Raw
+figure, subplot('Position', [0.05,0.1,.45,.8])
+plot(t,I_b, t,I_c, t,I_bg);
+title('Raw Intensity Curves')
+xlabel('Time Scale/s')
+ylabel('Raw Intensity per Pixel')
+axis([min(t),max(t),0,1.05])% Grid Axis
+grid on
+set(gca, 'GridLineStyle', '-');
+grid(gca,'minor')
+
+legend(gca, 'FRAP ROI Raw Intensities','Whole Cell Raw Intensity','Background Raw Intensity', 'Location', 'best' );
+
+subplot('Position', [0.53,0.1,.45,.8])
+plot(t,I_b - I_bg, t,I_c - I_bg, t,I_bg - I_bg);
+title('Background Subtracted Intensity Curves')
+xlabel('Time Scale/s')
+axis([min(t),max(t),0,1.05])% Grid Axis
+grid on
+set(gca, 'GridLineStyle', '-');
+grid(gca,'minor')
+
+set(gcf, 'Position', [50,100,900,350])
+
+% Plotting dI and fI
+figure, subplot('Position', [0.05,0.1,.45,.8])
+plot(t,dI)
+title('Double Normalised Curve')
+xlabel('Time Scale/s')
+ylabel('Normalised Intensity')
+
+axis([min(t),max(t),0,1.05])% Grid Axis
+grid on
+set(gca, 'GridLineStyle', '-');
+grid(gca,'minor')
+
+subplot('Position', [0.53,0.1,.45,.8])
+plot(t,fI)
+title('Full Normalised Curve')
+xlabel('Time Scale/s')
+grid on
+
+axis([min(t),max(t),0,1.05])% Grid Axis
+grid on
+set(gca, 'GridLineStyle', '-');
+grid(gca,'minor')
+
+set(gcf, 'Position', [970,100,900,350])
+
+%% Fitting Expoential Data
+% single fit
+[dnorm_sfit,dnorm_sfit_gof,dnorm_sfit_mobhalf, dnorm_sfit_uncer] = fitExp(dI,t);
+[fnorm_sfit,fnorm_sfit_gof,fnorm_sfit_mobhalf, fnorm_sfit_uncer] = fitExp(fI,t);
+
+% double fit
+[dnorm_dfit,dnorm_dfit_gof,dnorm_dfit_mobhalf, dnorm_dfit_uncer] = fitExp(dI,t,'double');
+[fnorm_dfit,fnorm_dfit_gof,fnorm_dfit_mobhalf, fnorm_dfit_uncer] = fitExp(fI,t,'double');
+
+%% Mobile Fraction
+% single expoential fit
+fprintf('Single fit double normalised mobile fraction: (%-.*f   +/-   %-.1g) \n',(length(sprintf('%.1g', dnorm_sfit_uncer.mobile))-2), dnorm_sfit_mobhalf.mobile, dnorm_sfit_uncer.mobile)
+fprintf('Single fit full normalised mobile fraction:   (%-.*f   +/-   %-.1g) \n',(length(sprintf('%.1g', fnorm_sfit_uncer.mobile))-2), fnorm_sfit_mobhalf.mobile, fnorm_sfit_uncer.mobile)
+
+% double expoential fit
+fprintf('Double fit double normalised mobile fraction: (%-.*f   +/-   %-.1g) \n',(length(sprintf('%.1g', dnorm_dfit_uncer.mobile))-2), dnorm_dfit_mobhalf.mobile, dnorm_dfit_uncer.mobile)
+fprintf('Double fit full normalised mobile fraction:   (%-.*f   +/-   %-.1g) \n',(length(sprintf('%.1g', fnorm_dfit_uncer.mobile))-2), fnorm_dfit_mobhalf.mobile, fnorm_dfit_uncer.mobile)
+
+%% half lives
+% single expoential fit
+fprintf('Single fit double normalised halflife:  (%-.*f   +/-   %-.1g)s \n',(length(sprintf('%.1g', dnorm_sfit_uncer.halflife))-2), dnorm_sfit_mobhalf.halflife, dnorm_sfit_uncer.halflife)
+fprintf('Single fit full normalised halflife:    (%-.*f   +/-   %-.1g)s \n',(length(sprintf('%.1g', fnorm_sfit_uncer.halflife))-2), fnorm_sfit_mobhalf.halflife, fnorm_sfit_uncer.halflife)
+
+% double expoential fit
+fprintf('Double fit double normalised halflife:  (%-.*f   +/-   %-.1g)s \n',(length(sprintf('%.1g', dnorm_dfit_uncer.halflife))-2), dnorm_dfit_mobhalf.halflife, dnorm_dfit_uncer.halflife)
+fprintf('Double fit full normalised halflife:    (%-.*f   +/-   %-.1g)s \n',(length(sprintf('%.1g', fnorm_dfit_uncer.halflife))-2), fnorm_dfit_mobhalf.halflife, fnorm_dfit_uncer.halflife)
+
+%% Fitting Uniform Circle Kinetics
+% Only works on full normalised data, if double normalised data is entered
+% it is changed to full automatically
+[fit_UniCirc,fit_UniCirc_gof,fit_UniCirc_uncer] = fitUniCirc(fI,t);
+fprintf('Uniform Circle fit charistic diffusion time:  (%-.*f   +/-  %-.1g)s \n',(length(sprintf('%.1g',fit_UniCirc_uncer.td))-2),fit_UniCirc.td, fit_UniCirc_uncer.td)
+
+
+%% Diffusion Constant:
+% assume uniform circular beam intensity profile:
+
+w2 = sum(sum(bleachMask))/pi; %Circle radius squared
+w = sqrt(w2); %Circle radius squared
+dw = sqrt(sum(sum(imclose(bleachMask,strel('disk',ceil(w/2)))))/pi);
+ew = sqrt(sum(sum(imopen(bleachMask,strel('disk',ceil(w/2)))))/pi);
+uncer_w2 = ((dw - ew)/2)*2*(w); % uncertinity in circle radius squared
+
+fprintf('Radius of circle:  (%-g   +/-  %-g)pixels \n',w, ((dw - ew)/2))
+
+% single expoential fit
+dnorm_sfit_D = 0.224*(w2)/(dnorm_sfit_mobhalf.halflife);
+dnorm_sfit_uncer.D = 0.224*(dnorm_sfit_mobhalf.halflife)^(-1) * sqrt(uncer_w2^2 + (w2*dnorm_sfit_uncer.halflife/dnorm_sfit_mobhalf.halflife)^2);
+fprintf('Single fit double normalised diffusion constant:  (%-g   +/-  %-g)pixel^2.s^-1 \n',dnorm_sfit_D, dnorm_sfit_uncer.D)
+
+fnorm_sfit_D = 0.224*(w2)/(fnorm_sfit_mobhalf.halflife);
+fnorm_sfit_uncer.D = 0.224*(fnorm_sfit_mobhalf.halflife)^(-1) * sqrt(uncer_w2^2 + (w2*fnorm_sfit_uncer.halflife/fnorm_sfit_mobhalf.halflife)^2);
+fprintf('Single fit full normalised diffusion constant:    (%-g   +/-  %-g)pixel^2.s^-1 \n',fnorm_sfit_D, fnorm_sfit_uncer.D)
+
+% double expoential fit
+dnorm_dfit_D = 0.224*(w2)/(dnorm_dfit_mobhalf.halflife);
+dnorm_dfit_uncer.D = 0.224*(dnorm_dfit_mobhalf.halflife)^(-1) * sqrt(uncer_w2^2 + (w2*dnorm_dfit_uncer.halflife/dnorm_dfit_mobhalf.halflife)^2);
+fprintf('Double fit double normalised diffusion constant:  (%-g   +/-  %-g)m^2.s^-1 \n',dnorm_dfit_D, dnorm_dfit_uncer.D)
+
+fnorm_dfit_D = 0.224*(w2)/(fnorm_dfit_mobhalf.halflife);
+fnorm_dfit_uncer.D = 0.224*(fnorm_dfit_mobhalf.halflife)^(-1) * sqrt(uncer_w2^2 + (w2*fnorm_dfit_uncer.halflife/fnorm_dfit_mobhalf.halflife)^2);
+fprintf('Double fit full normalised diffusion constant:    (%-g   +/-  %-g)m^2.s^-1 \n',fnorm_dfit_D, fnorm_dfit_uncer.D)
+
+% Uniform Circle Fitting
+fit_UniCirc_D = (w2)/(4*fit_UniCirc.td);
+fit_UniCirc_uncer.D = (4*fit_UniCirc.td)^(-1) * sqrt(uncer_w2^2 + (w2*fit_UniCirc_uncer.td/fit_UniCirc.td)^2);
+fprintf('Uniform Circle fit diffusion constant:            (%-g   +/-  %-g)m^2.s^-1 \n',fit_UniCirc_D, fit_UniCirc_uncer.D)
+
+##### SOURCE END #####
+--></body></html>
